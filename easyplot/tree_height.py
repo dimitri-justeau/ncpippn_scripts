@@ -41,8 +41,8 @@ if __name__ == '__main__':
         (u'ncpippn',
          [
              fld_ctrl.TextField(u'id',
-                                   label=u'id',
-                                   readonly=True),
+                                label=u'id',
+                                readonly=True),
              fld_ctrl.IntegerField(u'strata',
                                    label=u'strata',
                                    readonly=True),

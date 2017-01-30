@@ -39,7 +39,7 @@ if __name__ == '__main__':
     APP = [
         (u'ncpippn',
          [
-             fld_ctrl.IntegerField(u'id', label=u'id', readonly=True),
+             fld_ctrl.TextField(u'id', label=u'id', readonly=True),
              fld_ctrl.FloatArrayField(u'circumferences', label=u'circ.'),
              fld_ctrl.IntegerEnumField(u'strata', label=u'strata',
                                        enum_values=range(5)),

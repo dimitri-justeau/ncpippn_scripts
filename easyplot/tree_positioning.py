@@ -39,9 +39,9 @@ if __name__ == '__main__':
     APP = [
         (u'ncpippn',
          [
-             fld_ctrl.IntegerField(u'id',
-                                   label=u'id',
-                                   readonly=True),
+             fld_ctrl.TextField(u'id',
+                                label=u'id',
+                                readonly=True),
              fld_ctrl.TextField(u'quadrat',
                                 label=u'quadrat',
                                 readonly=True),
