@@ -83,7 +83,7 @@ class FloatArrayEdit(EasyEdit):
         self.array_values = None
         self._restoring = False
         try:
-            self.array_values = self.text.split(",")
+            self.array_values = self.text.split(";")
             for i, v in enumerate(self.array_values):
                 if i == len(self.array_values) - 1 and v == '':
                     continue
@@ -94,10 +94,9 @@ class FloatArrayEdit(EasyEdit):
     def on_change(self, event):
         if len(self.text) > 0:
             try:
-                n_array_values = self.text.split(",")
-                self.array_values = self.text.split(",")
-                for i, v in enumerate(self.array_values):
-                    if i == len(self.array_values) - 1 and v == '':
+                n_array_values = self.text.split(";")
+                for i, v in enumerate(n_array_values):
+                    if i == len(n_array_values) - 1 and v == '':
                         continue
                     float(v)
                 self.array_values = n_array_values

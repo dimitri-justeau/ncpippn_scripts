@@ -148,11 +148,6 @@ class FloatArrayField(FieldController):
         # Not really used at the moment
         if value is None:
             return
-        vals = value.split(",")
-        for i, v in enumerate(vals):
-            if i == len(vals) - 1 and v == '':
-                continue
-            float(v)
         return
 
 
