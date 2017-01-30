@@ -2,20 +2,30 @@
 
 import math
 import csv
+import sqlite3
 
 import matplotlib.pyplot as plt
 
 
 # IDX
 ID_IDX = 0
-HEIGHT_IDX = 12
-REF_IDX = 13
-HDIST_IDX = 14
-AZIMUTH_IDX = 15
-CIRCS_IDX = 9
-DBH_IDX = 10
-X_IDX = 16
-Y_IDX = 17
+CIRCS_IDX = 3
+DBH_IDX = 4
+HEIGHT_IDX = 5
+REF_IDX = 6
+HDIST_IDX = 7
+AZIMUTH_IDX = 8
+X_IDX = 9
+Y_IDX = 10
+
+
+def easyplot_db_to_data_array(database_path):
+    c = sqlite3.connect(database_path)
+    cur = c.cursor()
+    cur.execute("SELECT * FROM ncpippn;")
+    data = cur.fetchall()
+    c.close()
+    return data
 
 
 def stem_circ_to_dbh(*stems):
@@ -56,7 +66,7 @@ def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented):
     return ref_x + dx, ref_y + dy
 
 
-def compile_data(input_csv_file, output_csv_file, csv_delimiter, plot_azimuth, output_plot_jpg, north_oriented, relative):
+def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, output_plot_jpg, north_oriented, relative):
 
     # Generate references
     v_refs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
@@ -92,10 +102,9 @@ def compile_data(input_csv_file, output_csv_file, csv_delimiter, plot_azimuth, o
                 lxref.append(x1)
                 lyref.append(y1)
 
-    with open(input_csv_file, 'r', newline='') as origin, open(output_csv_file, 'w', newline='') as dest:
-        origin_reader = csv.reader(origin, delimiter=csv_delimiter)
+    with open(output_csv_file, 'w', newline='') as dest:
         dest_writer = csv.writer(dest, delimiter=csv_delimiter)
-        for i, row in enumerate(origin_reader):
+        for i, row in enumerate(easyplot_db_to_data_array(input_database)):
             if i == 0 or (row[0] in refs.keys() and not relative):
                 continue
             d_row = [val for val in row]
@@ -193,8 +202,8 @@ if __name__ == '__main__':
         """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
-        'input_csv_file',
-        help="The input file"
+        'input_database',
+        help="The input easyplot database"
     )
     parser.add_argument(
         'output_csv_file',
@@ -239,7 +248,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    input_file = args.input_csv_file
+    input_database = args.input_database
     output_file = args.output_csv_file
     csv_separator = args.csv_separator
     plot_azimuth = args.plot_azimuth
@@ -261,4 +270,4 @@ if __name__ == '__main__':
             print("Aborting...")
             sys.exit()
 
-    compile_data(input_file, output_file, csv_separator, plot_azimuth, output_plot_jpg, north_oriented, relative)
+    compile_data(input_database, output_file, csv_separator, plot_azimuth, output_plot_jpg, north_oriented, relative)
