@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         'database_path',
-        help="The output path of the database to generate."
+        help="The output path of the database to generate. To make it openable by EasyPlot, the suffix should be '.epdb'."
     )
     parser.add_argument(
         'start_id',
