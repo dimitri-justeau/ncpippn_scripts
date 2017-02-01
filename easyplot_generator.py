@@ -80,8 +80,11 @@ if __name__ == '__main__':
             raise ValueError("invalid default answer: '%s'" % default)
 
         while True:
-            sys.stdout.write(question + prompt)
-            choice = input().lower()
+            # For python2/3 compatibility
+            input = __builtins__.input
+            if hasattr(__builtins__, 'raw_input'):
+                input = raw_input
+            choice = input(question + prompt).lower()
             if default is not None and choice == '':
                 return valid[default]
             elif choice in valid:
@@ -117,10 +120,12 @@ if __name__ == '__main__':
     end_id = args.end_id
 
     if os.path.exists(database_path):
-        b = query_yes_no("{} already exist, do you want to overwrite it?"
-                         .format(database_path))
+        pass
+        b = query_yes_no("{} already exist, do you want to overwrite it?".format(database_path))
         if not b:
             print("Aborting...")
             sys.exit()
 
     generate_easyplot_dabatase(database_path, start_id, end_id)
+    print("{} created with identifiers from {} to {}."
+          .format(database_path, start_id, end_id))

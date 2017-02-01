@@ -9,6 +9,11 @@ Three tools are available:
 3. **ncpippn_compiler.py** is a command-line tool that takes an easyplot database and compile it's data (dbh and positions) to produce a .csv file.
 
 
+Before using the scripts, it is necessary to install the python dependencies in requirements.txt (now there is only matplotlib, for the plot jpg output in ncpippn_compiler. To do so, execute the following command in the project folder:
+
+```pip install -r requirements.txt```
+
+
 ## easyplot ##
 
 Documentation available soon.

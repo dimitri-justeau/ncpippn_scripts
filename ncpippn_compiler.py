@@ -103,7 +103,7 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                 lxref.append(x1)
                 lyref.append(y1)
 
-    with open(output_csv_file, 'w', newline='') as dest:
+    with open(output_csv_file, 'w') as dest:
         dest_writer = csv.writer(dest, delimiter=csv_delimiter)
         for i, row in enumerate(easyplot_db_to_data_array(input_database)):
             if i == 0 or (row[0] in refs.keys() and not relative):
@@ -186,8 +186,11 @@ if __name__ == '__main__':
             raise ValueError("invalid default answer: '%s'" % default)
 
         while True:
-            sys.stdout.write(question + prompt)
-            choice = input().lower()
+            # For python2/3 compatibility
+            input = __builtins__.input
+            if hasattr(__builtins__, 'raw_input'):
+                input = raw_input
+            choice = input(question + prompt).lower()
             if default is not None and choice == '':
                 return valid[default]
             elif choice in valid:
@@ -259,14 +262,13 @@ if __name__ == '__main__':
     relative = args.relative
 
     if os.path.exists(output_file):
-        b = query_yes_no("{} already exist, do you want to overwrite it?"
-                         .format(output_file))
+        b = query_yes_no("{} already exist, do you want to overwrite it?".format(output_file))
         if not b:
             print("Aborting...")
             sys.exit()
 
     if output_plot_jpg is not None and os.path.exists(output_plot_jpg):
-        b = query_yes_no("{} already exist, do you want to overwrite it?"
+        b = query_yes_no("{} already exist, do you want to overwrite it?"\
                          .format(output_plot_jpg))
         if not b:
             print("Aborting...")
