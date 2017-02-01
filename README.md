@@ -30,7 +30,7 @@ easyplot_generator.py [-h] database_path start_id end_id
 
 ncpippn_compiler.py takes an easyplot database, compute the dbh from the circumferences data, compute the positions from the Trupulse data (postions can be computed plot oriented, north oriented, or north oriented with relative references positioning).
 
-It is a command-line tool with a simple usage:
+It is a command-line tool written in Python, with a simple usage:
 
 ```
 ncpippn_compiler.py [-h] [--csv_separator CSV_SEPARATOR]
