@@ -20,7 +20,8 @@ easyplot_generator.py generates databases for collecting field data with easyplo
 ```
 easyplot_generator.py [-h] database_path start_id end_id
 
-  database_path  The output path of the database to generate. To make it openable by EasyPlot, the suffix should be '.epdb'.      
+  database_path  The output path of the database to generate.
+                 To make it openable by EasyPlot, the suffix should be '.epdb'.      
   start_id       The starting id of the database to generate.
   end_id         The ending id of the database to generate.
 ```
@@ -46,8 +47,16 @@ positional arguments:
 
 optional arguments:
   -h, --help                            show this help message and exit
-  --csv_separator CSV_SEPARATOR         The separator character to use for writing the output csv file.
-  --output_plot_jpg OUTPUT_PLOT_JPG     If specified, NCPIPPN Compiler will generate a jpg representation of the plot, with the positions of the trees.
-  --north_oriented NORTH_ORIENTED       Compute the x, y coordinates in the north oriented coordinate system (boolean: true/false).
-  --relative RELATIVE                   Compute the x, y coordinates in the north oriented using the relative positioning of the references (boolean: true/false).
+  --csv_separator CSV_SEPARATOR         The separator character to use for
+                                        writing the output csv file.
+  --output_plot_jpg OUTPUT_PLOT_JPG     If specified, NCPIPPN Compiler will 
+                                        generate a jpg representation of the 
+                                        plot, with the positions of the trees.
+  --north_oriented NORTH_ORIENTED       Compute the x, y coordinates in the 
+                                        north oriented coordinate system 
+                                        (boolean: true/false).
+  --relative RELATIVE                   Compute the x, y coordinates in the 
+                                        north oriented using the relative 
+                                        positioning of the references 
+                                        (boolean: true/false).
 ```
