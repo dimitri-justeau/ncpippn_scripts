@@ -46,17 +46,13 @@ positional arguments:
   output_csv_file       The output file
 
 optional arguments:
-  -h, --help                            show this help message and exit
-  --csv_separator CSV_SEPARATOR         The separator character to use for
-                                        writing the output csv file.
-  --output_plot_jpg OUTPUT_PLOT_JPG     If specified, NCPIPPN Compiler will 
-                                        generate a jpg representation of the 
-                                        plot, with the positions of the trees.
-  --north_oriented NORTH_ORIENTED       Compute the x, y coordinates in the 
-                                        north oriented coordinate system 
-                                        (boolean: true/false).
-  --relative RELATIVE                   Compute the x, y coordinates in the 
-                                        north oriented using the relative 
-                                        positioning of the references 
-                                        (boolean: true/false).
+  -h, --help                          show this help message and exit
+  --csv_separator CSV_SEPARATOR       The separator character to use for writing the output csv file.
+  --output_plot_jpg OUTPUT_PLOT_JPG   If specified, NCPIPPN Compiler will generate a jpg representation 
+                                          of the plot, with the positions of the trees.
+  --north_oriented NORTH_ORIENTED     Compute the x, y coordinates in the north oriented coordinate system. 
+                                          (boolean: true/false).
+  --relative RELATIVE                 Compute the x, y coordinates in the north oriented using the
+                                          relative positioning of the references 
+                                          (boolean: true/false).
 ```
