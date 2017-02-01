@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # coding: utf-8
 
 import math
@@ -198,12 +199,18 @@ if __name__ == '__main__':
     description = \
         """
         NCPIPPN Compiler is a utility program for compiling field data from
-        a NCPIPPN plot. Copyright 'Les blaireaux'.
+        a NCPIPPN plot. By default, compute the positions in the plot oriented
+        coordinate system. it computes Copyright 'Les blaireaux'.
         """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
+        'plot_azimuth',
+        type=float,
+        help="The plot azimuth (float)"
+    )
+    parser.add_argument(
         'input_database',
-        help="The input easyplot database"
+        help="The input easyplot database (.epdb)"
     )
     parser.add_argument(
         'output_csv_file',
@@ -212,12 +219,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--csv_separator',
         default=',',
-        help="The separator character to use for reading and writing csv."
-    )
-    parser.add_argument(
-        '--plot_azimuth',
-        type=float,
-        help="The plot azimuth"
+        help="The separator character to use for writing the output csv file"
     )
     parser.add_argument(
         '--output_plot_jpg',
@@ -232,8 +234,8 @@ if __name__ == '__main__':
         type=bool,
         default=False,
         help="""
-            compute the x, y coordinates in the north oriented
-            coordinate system.
+            Compute the x, y coordinates in the north oriented
+            coordinate system (boolean: true/false).
             """
     )
     parser.add_argument(
@@ -241,8 +243,8 @@ if __name__ == '__main__':
         type=bool,
         default=False,
         help="""
-            compute the x, y coordinates in the north oriented using the
-            relative positioning of the references.
+            Compute the x, y coordinates in the north oriented using the
+            relative positioning of the references (boolean: true/false).
             """
     )
 

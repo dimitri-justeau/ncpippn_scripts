@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # coding: utf-8
 
 import sqlite3
@@ -91,8 +92,8 @@ if __name__ == '__main__':
 
     description = \
         """
-        Easyplot Generator generates a database and a launcher script for
-        collecting field data with Easyplot.
+        Easyplot Generator generates a database for collecting field
+        data with Easyplot.
         """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
