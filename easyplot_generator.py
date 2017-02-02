@@ -24,7 +24,6 @@ def generate_references():
 
 def generate_easyplot_dabatase(database_path, start_id, end_id):
     refs = ["('{}')".format(i) for i in generate_references()]
-    vals = ["('{}')".format(i) for i in range(start_id, end_id + 1)]
     sql = \
         """
         DROP TABLE IF EXISTS ncpippn;
@@ -43,13 +42,26 @@ def generate_easyplot_dabatase(database_path, start_id, end_id):
         );
         /* First insert references */
         INSERT INTO ncpippn (id) VALUES {};
-        /* Insert identifiers */
-        INSERT INTO ncpippn (id) VALUES {};
-        """.format(','.join(refs), ','.join(vals))
+        """.format(','.join(refs))
     connexion = sqlite3.connect(database_path)
     cursor = connexion.cursor()
     cursor.executescript(sql)
-
+    BATCH_SIZE = 300
+    RANGE = range(start_id, end_id + 1)
+    for i in range((len(RANGE) // BATCH_SIZE) + 1):
+        start = RANGE[0] + i * BATCH_SIZE
+        if i != len(RANGE) // BATCH_SIZE:
+            end = RANGE[0] + (i + 1) * BATCH_SIZE
+        else:
+            end = RANGE[len(RANGE) - 1] + 1
+        vals = ["('{}')".format(k) for k in range(start, end)]
+        sql_bis = \
+            """
+            /* Insert identifiers */
+            INSERT INTO ncpippn (id) VALUES {};
+            """.format(','.join(vals))
+        cursor = connexion.cursor()
+        cursor.execute(sql_bis)
 
 if __name__ == '__main__':
 
