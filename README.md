@@ -15,7 +15,7 @@ Three tools are available:
 
 **Linux users**: You do not need to install Python, it is already installed in your system.
 
-**Windows users**: If you have not installed Python yet, you need to install it. To do so, go to Python's website (https://www.python.org/) and download the latest release for your system. It does not matter if you choose Python 2 or Python 3, *easyplot_generator.py* and *ncpippn_compiler.py* are compatible with both. Once the download is completed, run the installer.
+**Windows users**: If you have not installed Python yet, you need to install it. To do so, go to Python's website (https://www.python.org/) and download the latest release for your system. It does not matter if you choose Python 2 or Python 3, *easyplot_generator.py* and *ncpippn_compiler.py* are compatible with both. Once the download is completed, run the installer. Finally, add the Python installation directory to your path (it should be "C:\Python<version>\"), and the Python Scripts directory (is should be "C:\Python<version>\Scripts\"), for having access to Python and pip in the Windows shell.
 
 ### Install dependencies ###
 
