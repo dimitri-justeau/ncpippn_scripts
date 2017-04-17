@@ -34,7 +34,7 @@ def generate_easyplot_dabatase(database_path, start_id, end_id):
             circumferences TEXT,
             dbh REAL,
             height REAL,
-            ref TEXT,
+            reference TEXT,
             hdist REAL,
             azimuth REAL,
             x REAL,
