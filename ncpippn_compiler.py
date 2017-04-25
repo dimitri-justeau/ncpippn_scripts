@@ -110,11 +110,11 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                 continue
             d_row = [val for val in row]
             dbh = 15
-            if len(row[CIRCS_IDX]) > 0:
+            if row[CIRCS_IDX] > 0:
                 circs = [float(c) for c in row[CIRCS_IDX].split(';')]
                 dbh = round(stem_circ_to_dbh(*circs), 1)
                 d_row[DBH_IDX] = dbh
-            if len(row[REF_IDX]) > 0:
+            if row[REF_IDX] > 0:
                 ref = d_row[REF_IDX]
                 hdist = float(d_row[HDIST_IDX])
                 azimuth = float(d_row[AZIMUTH_IDX])
