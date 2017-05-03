@@ -84,7 +84,7 @@ def resolve_ref(ref, refs, input_database, plot_azimuth, north_oriented):
 
 
 def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented,
-           input_database):
+           input_database, force_0_100_bounds=False):
     """
     Compute and return the carthesian coordinates of a tree given
     a reference point, the horizontal distance between the reference
@@ -99,12 +99,22 @@ def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented,
     phi = azimuth_to_trigo(azimuth, az)
     dx = math.cos(phi) * hdist_rect
     dy = math.sin(phi) * hdist_rect
-    return ref_x + dx, ref_y + dy
+    x, y = ref_x + dx, ref_y + dy
+    if force_0_100_bounds:
+        if x > 100:
+            x = 100
+        if x < 0:
+            x = 0
+        if y > 100:
+            y = 100
+        if y < 0:
+            y = 0
+    return x, y
 
 
 def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth,
                  output_plot_png, north_oriented, relative,
-                 letters_abscissa=False):
+                 letters_abscissa, force_0_100_bounds):
 
     # Generate references
     if letters_abscissa:
@@ -178,7 +188,8 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth,
                         lyref_rel.append(y)
                 else:
                     x, y = get_xy(ref, dbh * 0.01, hdist, azimuth, refs,
-                                  plot_azimuth, north_oriented, input_database)
+                                  plot_azimuth, north_oriented, input_database,
+                                  force_0_100_bounds)
                     ldbh.append(dbh)
                     lx.append(x)
                     ly.append(y)
@@ -319,6 +330,15 @@ if __name__ == '__main__':
             is considered as the abscissa. (boolean: True/False).
             """
     )
+    parser.add_argument(
+        '--force_0_100_bounds',
+        type=str2bool,
+        default=True,
+        help="""
+            If True, the script will set negative tree position values to 0
+            and those exceeding 100 to 100.
+            """
+    )
 
     args = parser.parse_args()
 
@@ -329,7 +349,8 @@ if __name__ == '__main__':
     output_plot_png = args.output_plot_png
     north_oriented = args.north_oriented
     relative = args.relative
-    letters_abscissa = bool(args.letters_abscissa)
+    letters_abscissa = args.letters_abscissa
+    force_0_100_bounds = args.force_0_100_bounds
 
     if os.path.exists(output_file):
         b = query_yes_no("{} already exist, do you want to overwrite it?".format(output_file))
@@ -344,6 +365,14 @@ if __name__ == '__main__':
             print("Aborting...")
             sys.exit()
 
-    compile_data(input_database, output_file, csv_separator, plot_azimuth,
-                 output_plot_png, north_oriented, relative,
-                 letters_abscissa=letters_abscissa)
+    compile_data(
+        input_database,
+        output_file,
+        csv_separator,
+        plot_azimuth,
+        output_plot_png,
+        north_oriented,
+        relative,
+        letters_abscissa,
+        force_0_100_bounds
+    )
