@@ -29,6 +29,16 @@ def easyplot_db_to_data_array(database_path):
     return data
 
 
+def get_row_from_easyplot_db(database_path, row_id):
+    c = sqlite3.connect(database_path)
+    cur = c.cursor()
+    cur.execute("SELECT * FROM ncpippn WHERE ncpippn.id = '{}';"
+                .format(row_id))
+    data = cur.fetchone()
+    c.close()
+    return data
+
+
 def stem_circ_to_dbh(*stems):
     """
     Given a list of stem circumferences values, compute and return
@@ -50,14 +60,39 @@ def azimuth_to_trigo(azimuth, plot_azimuth):
     return math.radians(h) if h < 180 else math.radians(h - 360)
 
 
-def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented):
+def resolve_ref(ref, refs, input_database, plot_azimuth, north_oriented):
+    if ref in refs:
+        return refs[ref]
+    try:
+        row = get_row_from_easyplot_db(input_database, ref)
+    except:
+        raise ValueError(
+            "The reference '{}' does not exist in database.".format(ref)
+        )
+    ref_ref = row[REF_IDX]
+    if ref_ref is None:
+        raise ValueError(
+            "The reference '{}' had not been positioned.".format(ref)
+        )
+    ref_hdist = row[HDIST_IDX]
+    ref_dbh = row[DBH_IDX]
+    if ref_dbh is None:
+        ref_dbh = 0
+    ref_azimuth = row[AZIMUTH_IDX]
+    return get_xy(ref_ref, ref_dbh, ref_hdist, ref_azimuth, refs,
+                  plot_azimuth, north_oriented, input_database)
+
+
+def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented,
+           input_database):
     """
     Compute and return the carthesian coordinates of a tree given
     a reference point, the horizontal distance between the reference
     and the tree, the azimuth of the direction from the reference
     to the tree, and the dbh of the tree.
     """
-    ref_x, ref_y = refs[ref]
+    ref_x, ref_y = resolve_ref(ref, refs, input_database, plot_azimuth,
+                               north_oriented)
     # Rectified hdist with half the dbh of the tree.
     hdist_rect = hdist + 0.5 * dbh
     az = plot_azimuth if not north_oriented else 0
@@ -67,11 +102,17 @@ def get_xy(ref, dbh, hdist, azimuth, refs, plot_azimuth, north_oriented):
     return ref_x + dx, ref_y + dy
 
 
-def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, output_plot_jpg, north_oriented, relative):
+def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth,
+                 output_plot_png, north_oriented, relative,
+                 letters_abscissa=False):
 
     # Generate references
-    v_refs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-    h_refs = [str(i) for i in range(11)]
+    if letters_abscissa:
+        h_refs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        v_refs = [str(i) for i in range(11)]
+    else:
+        v_refs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        h_refs = [str(i) for i in range(11)]
     refs = {}
     rel_refs = {'A0': (0, 0)}
     lxref = []
@@ -86,7 +127,10 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
 
     for i, hr in enumerate(h_refs):
         for j, vr in enumerate(v_refs):
-            r = ''.join([vr, hr])
+            if letters_abscissa:
+                r = ''.join([hr, vr])
+            else:
+                r = ''.join([vr, hr])
             # Coordinates of the reference in the plot referential
             x1 = i * 10
             y1 = j * 10
@@ -103,9 +147,11 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                 lxref.append(x1)
                 lyref.append(y1)
 
+    data = easyplot_db_to_data_array(input_database)
+
     with open(output_csv_file, 'w') as dest:
         dest_writer = csv.writer(dest, delimiter=csv_delimiter)
-        for i, row in enumerate(easyplot_db_to_data_array(input_database)):
+        for i, row in enumerate(data):
             if i == 0 or (row[0] in refs.keys() and not relative):
                 continue
             d_row = [val for val in row]
@@ -119,7 +165,8 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                 hdist = float(d_row[HDIST_IDX])
                 azimuth = float(d_row[AZIMUTH_IDX])
                 if relative:
-                    x, y = get_xy(ref, dbh * 0.01, hdist, azimuth, rel_refs, plot_azimuth, north_oriented)
+                    x, y = get_xy(ref, dbh * 0.01, hdist, azimuth, rel_refs,
+                                  plot_azimuth, north_oriented, input_database)
                     rel_refs[row[ID_IDX]] = (x, y)
                     ldbh.append(dbh)
                     lx.append(x)
@@ -130,7 +177,8 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                         lxref_rel.append(x)
                         lyref_rel.append(y)
                 else:
-                    x, y = get_xy(ref, dbh * 0.01, hdist, azimuth, refs, plot_azimuth, north_oriented)
+                    x, y = get_xy(ref, dbh * 0.01, hdist, azimuth, refs,
+                                  plot_azimuth, north_oriented, input_database)
                     ldbh.append(dbh)
                     lx.append(x)
                     ly.append(y)
@@ -138,7 +186,7 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
                     d_row[Y_IDX] = y
             dest_writer.writerow(d_row)
 
-    if output_plot_jpg:
+    if output_plot_png:
         # Plot the results
         fig, ax = plt.subplots(figsize=(16, 16))
 
@@ -150,11 +198,14 @@ def compile_data(input_database, output_csv_file, csv_delimiter, plot_azimuth, o
         dtext = [1.5, -4]
         for i, hr in enumerate(h_refs):
             for j, vr in enumerate([str(v_refs[0]), str(v_refs[len(v_refs) - 1])]):
-                r = ''.join([vr, hr])
+                if letters_abscissa:
+                    r = ''.join([hr, vr])
+                else:
+                    r = ''.join([vr, hr])
                 ax.text(refs[r][0] + dtext[j], refs[r][1] + dtext[j], r,
                         fontsize=12, color='g')
 
-        plt.savefig(output_plot_jpg)
+        plt.savefig(output_plot_png, format='png')
 
 
 if __name__ == '__main__':
@@ -162,6 +213,15 @@ if __name__ == '__main__':
     import sys
     import os
     import argparse
+
+
+    def str2bool(v):
+        if v.lower() in ('yes', 'true', 't', 'y', '1'):
+            return True
+        if v.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
+        else:
+            raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
     def query_yes_no(question, default="yes"):
@@ -225,29 +285,38 @@ if __name__ == '__main__':
         help="The separator character to use for writing the output csv file"
     )
     parser.add_argument(
-        '--output_plot_jpg',
+        '--output_plot_png',
         default=None,
         help="""
-            If specified, NCPIPPN Compiler will generate a jpg representation
+            If specified, NCPIPPN Compiler will generate a png representation
             of the plot, with the positions of the trees.
             """
     )
     parser.add_argument(
         '--north_oriented',
-        type=bool,
+        type=str2bool,
         default=False,
         help="""
             Compute the x, y coordinates in the north oriented
-            coordinate system (boolean: true/false).
+            coordinate system (boolean: True/False).
             """
     )
     parser.add_argument(
         '--relative',
-        type=bool,
+        type=str2bool,
         default=False,
         help="""
             Compute the x, y coordinates in the north oriented using the
-            relative positioning of the references (boolean: true/false).
+            relative positioning of the references (boolean: True/False).
+            """
+    )
+    parser.add_argument(
+        '--letters_abscissa',
+        type=str2bool,
+        default=False,
+        help="""
+            If True, A0 -> K0 is considered as the abscissa. Else, A0 -> A10
+            is considered as the abscissa. (boolean: True/False).
             """
     )
 
@@ -257,9 +326,10 @@ if __name__ == '__main__':
     output_file = args.output_csv_file
     csv_separator = args.csv_separator
     plot_azimuth = args.plot_azimuth
-    output_plot_jpg = args.output_plot_jpg
+    output_plot_png = args.output_plot_png
     north_oriented = args.north_oriented
     relative = args.relative
+    letters_abscissa = bool(args.letters_abscissa)
 
     if os.path.exists(output_file):
         b = query_yes_no("{} already exist, do you want to overwrite it?".format(output_file))
@@ -267,11 +337,13 @@ if __name__ == '__main__':
             print("Aborting...")
             sys.exit()
 
-    if output_plot_jpg is not None and os.path.exists(output_plot_jpg):
+    if output_plot_png is not None and os.path.exists(output_plot_png):
         b = query_yes_no("{} already exist, do you want to overwrite it?"\
-                         .format(output_plot_jpg))
+                         .format(output_plot_png))
         if not b:
             print("Aborting...")
             sys.exit()
 
-    compile_data(input_database, output_file, csv_separator, plot_azimuth, output_plot_jpg, north_oriented, relative)
+    compile_data(input_database, output_file, csv_separator, plot_azimuth,
+                 output_plot_png, north_oriented, relative,
+                 letters_abscissa=letters_abscissa)
